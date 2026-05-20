@@ -162,7 +162,7 @@
 
 <body>
 
-    <h1>🚀 Dashboard IoT ESP32</h1>
+    <h1> Dashboard IoT ESP32</h1>
 
     <div class="contenedor">
 
@@ -244,7 +244,7 @@
 
         <h2 style="margin-bottom:20px; color:cyan;">
 
-            📈 Gráfica ADC Tiempo Real
+             Gráfica ADC Tiempo Real
 
         </h2>
 
@@ -254,7 +254,7 @@
 
     <div class="footer">
 
-        Proyecto Final - Sistemas Embebidos 😎🔥
+        Proyecto Final - Sistemas Embebidos
 
     </div>
 
@@ -355,49 +355,64 @@
 
         function actualizarDatos(){
 
-            // ADC aleatorio
+            try{
 
-            let adc = (Math.random() * 3.3).toFixed(3);
+                const response =
+                    await fetch("/history");
 
-            document.getElementById("adc1").innerText =
-                adc + " V";
+                const data =
+                    await response.json();
 
-            // BOTON random
+                // ---------------------------------
+                // VALIDAR DATOS
+                // ---------------------------------
 
-            let boton = Math.random() > 0.5;
+                if(data.adc1.length > 0){
 
-            if(boton){
+                    // ADC REAL
 
-                document.getElementById("estado_boton").innerHTML =
-                    "🟢 PRESIONADO";
+                    let adc =
+                        data.adc1[data.adc1.length - 1];
 
-            }else{
+                    document.getElementById("adc1").innerText =
+                        adc.toFixed(3) + " V";
 
-                document.getElementById("estado_boton").innerHTML =
-                    "🔴 LIBRE";
+                    // BOTON REAL
+
+                    let boton =
+                        data.pin23[data.pin23.length - 1];
+
+                    if(boton == 1){
+
+                        document.getElementById("estado_boton").innerHTML =
+                            "🟢 PRESIONADO";
+
+                    }else{
+
+                        document.getElementById("estado_boton").innerHTML =
+                            "🔴 LIBRE";
+                    }
+
+                    // GRAFICA REAL
+
+                    chart.data.labels =
+                        data.time;
+
+                    chart.data.datasets[0].data =
+                        data.adc1;
+
+                    chart.update();
+                }
+
+            }catch(error){
+
+                console.log(error);
             }
-
-            // GRAFICA
-
-            contador++;
-
-            etiquetas.push(contador);
-
-            datosADC.push(adc);
-
-            if(etiquetas.length > 20){
-
-                etiquetas.shift();
-
-                datosADC.shift();
-            }
-
-            chart.update();
         }
 
         // =========================================
 
-        setInterval(actualizarDatos, 1000);
+        setInterval(actualizarDatos, 2000);
 
     </script>
 
